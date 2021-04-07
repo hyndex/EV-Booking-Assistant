@@ -1,27 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Speech Recognition in Python</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/index.css') }}" />
-</head>
-<body>
-<div id="speechContainer">
-    <h1>Upload new File</h1>
-    <form method="post" enctype="multipart/form-data">
-        <input type="file" name="file"/>
-        <br>
-        <input type="submit" id="submitButton" value="Transcribe"/>
-    </form>
-
-    {% if transcript != "" %}
-        <div id="speechTranscriptContainer">
-            <h1>Transcript</h1>
-            <p id="speechText">{{ transcript }}</p>
+  <head>
+    <meta charset="UTF-8" />
+    <title>EV booking assistant</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mattdiamond/Recorderjs@08e7abd/dist/recorder.js"></script>
+    <style>
+      body {
+        background-image: url("{{ url_for('static', filename='giphy.gif') }}");
+      }
+      .btn {
+        max-width: 100%;
+      }
+      img {
+        max-width: 100%;
+      }
+      #audioForm {
+        opacity: 0.1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="container-fluid text-center mt-4">
+      <div class="row">
+        <div class="col">
+          <button @click="startRecording" :disabled="isRecording" class="btn">
+            <img src="{{ url_for('static', filename='record.png') }}" />
+          </button>
         </div>
-    {% endif %}
-</div>
+        <div class="col">
+          <button @click="stopRecording" :disabled="!isRecording" class="btn">
+            <img src="{{ url_for('static', filename='stop-button.png') }}" />
+          </button>
+        </div>
+      </div>
 
-</body>
+      {% if transcript != "" %}
+      <div id="speechTranscriptContainer" class="alert alert-success">
+        <h4 id="speechText">{{ transcript }}</h4>
+      </div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data" id="audioForm">
+        <input type="file" name="file" id="fileInput" />
+        <button>Submit</button>
+      </form>
+    </div>
+
+    <script>
+      var AudioContext = window.AudioContext || window.webkitAudioContext;
+      var audioContext = new AudioContext();
+      URL = window.URL || window.webkitURL;
+
+      const app = new Vue({
+        el: "#app",
+        delimiters: ["{(", ")}"],
+        data: {
+          isRecording: false,
+          isPaused: false,
+          stream: null,
+          input: null,
+          recorder: null,
+          response: null,
+        },
+        mounted: function () {},
+        methods: {
+          startRecording: function () {
+            if (this.isRecording) {
+              return;
+            }
+
+            var constraints = {
+              audio: true,
+              video: false,
+            };
+
+            navigator.mediaDevices
+              .getUserMedia(constraints)
+              .then((stream) => {
+                this.isRecording = true;
+                this.stream = stream;
+                this.input = audioContext.createMediaStreamSource(this.stream);
+                this.recorder = new Recorder(this.input, {
+                  numChannels: 1,
+                });
+                this.recorder.record();
+              })
+              .catch((err) => {
+                this.isRecording = false;
+                console.error(err);
+              });
+          },
+          pauseResumeRecording: function () {
+            if (this.isRecording) {
+              this.recorder.stop();
+              this.isPaused = true;
+            } else {
+              this.recorder.record();
+              this.isPaused = false;
+            }
+          },
+          stopRecording: function () {
+            this.isPaused = false;
+            this.isRecording = false;
+            this.recorder.stop();
+            this.stream.getAudioTracks()[0].stop();
+            this.recorder.exportWAV((blob) => {
+              var filename = `recording-${new Date().toISOString()}.wav`;
+              var file = new File([blob], filename, {
+                type: "audio/wav",
+                lastModified: new Date().getTime(),
+              });
+              var container = new DataTransfer();
+              container.items.add(file);
+              document.getElementById("fileInput").files = container.files;
+              document.getElementById("audioForm").submit();
+            });
+          },
+        },
+      });
+    </script>
+  </body>
 </html>
