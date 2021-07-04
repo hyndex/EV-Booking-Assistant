@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect
 import speech_recognition as sr
 import pandas as pd
+import numpy as np
 
 app = Flask(__name__)
 
@@ -134,8 +135,9 @@ def index():
                 queue[req_city] = queue[req_city]+1
                 data = pd.read_csv('loc.csv')
                 data['place_name']=data['place_name'].str.lower()
-                latitude=str(data[data['place_name']==req_city].latitude) 
-                longitude=str(data[data['place_name']==req_city].longitude)
+                latitude=str(np.array(data[data['place_name']=='golaghat'].latitude)[0]) 
+                longitude=str(np.array(data[data['place_name']=='golaghat'].longitude)[0])
+                print(longitude,longitude )
                 return render_template('index.html', transcript='charger has been booked in ' + req_city+' Your queue is '+str(queue[req_city]),latitude=latitude,longitude=longitude )
         return render_template('index.html', transcript='Charger not available in the requested city',latitude='26.2006', longitude='92.9376')
 
