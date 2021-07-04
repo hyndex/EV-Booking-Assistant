@@ -36,7 +36,8 @@ CITIES = [
     'sonitpur',
     'tinsukia',
     'udalguri',
-    'guwahati'
+    'guwahati',
+    'lucknow'
 ]
 # https://blog.addpipe.com/using-recorder-js-to-capture-wav-audio-in-your-html5-web-site/
 
@@ -70,39 +71,8 @@ queue = {'baksa': 0,
          'sonitpur': 0,
          'tinsukia': 0,
          'udalguri': 0,
-         'guwahati': 0}
-
-location = {'baksa': 0,
-         'barpeta': 0,
-         'biswanath': 0,
-         'bongaigaon': 0,
-         'cachar': 0,
-         'charaideo': 0,
-         'chirang': 0,
-         'darrang': 0,
-         'dhemaji': 0,
-         'dhubri': 0,
-         'dibrugarh': 0,
-         'dima Hasao': 0,
-         'goalpara': 0,
-         'golaghat': 0,
-         'hailakandi': 0,
-         'hojai': 0,
-         'jorhat': 0,
-         'kamrup': 0,
-         'karbianglong': 0,
-         'karimganj': 0,
-         'kokrajhar': 0,
-         'lakhimpur': 0,
-         'majuli': 0,
-         'morigaon': 0,
-         'nagaon': 0,
-         'nalbari': 0,
-         'sivasagar': 0,
-         'sonitpur': 0,
-         'tinsukia': 0,
-         'udalguri': 0,
-         'guwahati': 0}
+         'guwahati': 0,
+         'lucknow': 0}
 
 
 @app.route("/", methods=["GET", "POST"])
