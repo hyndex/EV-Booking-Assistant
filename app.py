@@ -98,7 +98,21 @@ def index():
             except:
                 return render_template('index.html',latitude='26.2006', longitude='92.9376', transcript='Try again')
 
-        for req_city in (transcript.lower().split(' ')):
+        for req_city in (transcript.lower().split(' ')): 
+            message = ''
+            youtube=''
+
+            import webbrowser
+
+            if(req_city.lower()=='message'):
+                message = 'play'
+                print('message')
+                # webbrowser.open_new_tab('http://mylink.com')
+                return render_template('index.html',message=message)            
+            if(req_city.lower()=='play'):
+                youtube = 'play'
+                print('yoko')
+                return render_template('index.html',youtube=youtube)            
             print(req_city)
             if req_city in CITIES:
                 print(req_city)
