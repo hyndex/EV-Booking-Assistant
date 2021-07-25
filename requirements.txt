@@ -1,0 +1,5 @@
+flask
+speech_recognition
+pandas
+numpy
+requests
