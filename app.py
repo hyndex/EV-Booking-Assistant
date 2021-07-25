@@ -125,7 +125,7 @@ def index():
                     np.array(data[data['place_name'] == 'golaghat'].longitude)[0])
 
                 try:
-                    result = requests.get(url='https://4r532dd099dd.ngrok.io/ocpp/BookCharger',
+                    result = requests.post(url='https://4r532dd099dd.ngrok.io/ocpp/BookCharger',
                                           params={'lat': latitude, 'lon': longitude})
                 except:
                     print('Booking failed')
