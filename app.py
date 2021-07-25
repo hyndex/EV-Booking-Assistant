@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect
 import speech_recognition as sr
 import pandas as pd
 import numpy as np
+import requests
 
 app = Flask(__name__)
 
@@ -96,36 +97,43 @@ def index():
             try:
                 transcript = recognizer.recognize_google(data, key=None)
             except:
-                return render_template('index.html',latitude='26.2006', longitude='92.9376', transcript='Try again')
+                return render_template('index.html', latitude='26.2006', longitude='92.9376', transcript='Try again')
 
-        for req_city in (transcript.lower().split(' ')): 
+        print('OK!!!!')
+        for req_city in (transcript.lower().split(' ')):
             message = ''
-            youtube=''
+            youtube = ''
 
-            import webbrowser
-
-            if(req_city.lower()=='message'):
+            if(req_city.lower() == 'message'):
                 message = 'play'
                 print('message')
                 # webbrowser.open_new_tab('http://mylink.com')
-                return render_template('index.html',message=message)            
-            if(req_city.lower()=='play'):
+                return render_template('index.html', message=message, youtube=youtube)
+            if(req_city.lower() == 'play'):
                 youtube = 'play'
-                print('yoko')
-                return render_template('index.html',youtube=youtube)            
-            print(req_city)
+                print('youtube')
+                return render_template('index.html', message=message, youtube=youtube)
             if req_city in CITIES:
+                print('booking')
                 print(req_city)
                 queue[req_city] = queue[req_city]+1
                 data = pd.read_csv('loc.csv')
-                data['place_name']=data['place_name'].str.lower()
-                latitude=str(np.array(data[data['place_name']=='golaghat'].latitude)[0]) 
-                longitude=str(np.array(data[data['place_name']=='golaghat'].longitude)[0])
-                print(longitude,longitude )
-                return render_template('index.html', transcript='charger has been booked in ' + req_city+' Your queue is '+str(queue[req_city]),latitude=latitude,longitude=longitude )
-        return render_template('index.html', transcript='Charger not available in the requested city',latitude='26.2006', longitude='92.9376')
+                data['place_name'] = data['place_name'].str.lower()
+                latitude = str(
+                    np.array(data[data['place_name'] == 'golaghat'].latitude)[0])
+                longitude = str(
+                    np.array(data[data['place_name'] == 'golaghat'].longitude)[0])
 
-    return render_template('index.html')
+                try:
+                    result = requests.get(url='https://4r532dd099dd.ngrok.io/ocpp/BookCharger',
+                                          params={'lat': latitude, 'lon': longitude})
+                except:
+                    print('Booking failed')
+
+                return render_template('index.html', transcript='charger has been booked in ' + req_city+' Your queue is '+str(queue[req_city]), latitude=latitude, longitude=longitude, message=message, youtube=youtube)
+        return render_template('index.html', transcript='Charger not available in the requested city', latitude='26.2006', longitude='92.9376', message=message, youtube=youtube)
+
+    return render_template('index.html', youtube='', message='')
 
 
 if __name__ == "__main__":
